@@ -6,21 +6,27 @@ ARCH=$(uname -m)
 
 echo "Installing package dependencies..."
 echo "---------------------------------------------------------------"
-pacman -Syu --noconfirm libdecor
+pacman -Syu --noconfirm cmake nasm sdl3_mixer
 
 echo "Installing debloated packages..."
 echo "---------------------------------------------------------------"
-get-debloated-pkgs --add-common --prefer-nano
+get-debloated-pkgs --add-common --prefer-nano libdecor-mini
 
-# Comment this out if you need an AUR package
 if [ "${DEVEL_RELEASE-}" = "1" ]; then
-    package="augustus-git"
-    make-aur-package "$package"
+    echo "Building Augustus..."
+    echo "---------------------------------------------------------------"
+    REPO="https://github.com/Keriew/augustus"
+    VERSION="$(git ls-remote "$REPO" HEAD | cut -c 1-9 | head -1)"
+    git clone --recursive --depth 1 "$REPO" ./augustus
+    echo "$VERSION" > ~/version
+
+    cmake -B build -S ./augustus \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DSDL_VERSION=3
+    cmake --build build -j$(nproc)
+    cmake --install build
 else
-    package="augustus"
-    sudo pacman -S --noconfirm "$package"
+    sudo pacman -S --noconfirm augustus
+    pacman -Q augustus | awk '{print $2; exit}' > ~/version
 fi
-
-pacman -Q "$package" | awk '{print $2; exit}' > ~/version
-
-# If the application needs to be manually built that has to be done down here
