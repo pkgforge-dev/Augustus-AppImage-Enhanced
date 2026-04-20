@@ -20,7 +20,6 @@ else
     package="augustus"
     sudo pacman -S --noconfirm "$package"
 fi
-
 pacman -Q "$package" | awk '{print $2; exit}' > ~/version
 
 # If the application needs to be manually built that has to be done down here
