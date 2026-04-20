@@ -6,11 +6,11 @@ ARCH=$(uname -m)
 
 echo "Installing package dependencies..."
 echo "---------------------------------------------------------------"
-pacman -Syu --noconfirm libdecor
+#pacman -Syu --noconfirm
 
 echo "Installing debloated packages..."
 echo "---------------------------------------------------------------"
-get-debloated-pkgs --add-common --prefer-nano
+get-debloated-pkgs --add-common --prefer-nano libdecor-mini
 
 # Comment this out if you need an AUR package
 if [ "${DEVEL_RELEASE-}" = "1" ]; then
@@ -20,7 +20,6 @@ else
     package="augustus"
     sudo pacman -S --noconfirm "$package"
 fi
-
 pacman -Q "$package" | awk '{print $2; exit}' > ~/version
 
 # If the application needs to be manually built that has to be done down here
